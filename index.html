@@ -1,0 +1,288 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex, nofollow, noarchive">
+<title>Démo · Programme du soir, 21 jours</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+:root{--ink:#09371F;--ink2:#3E5C4C;--ground:#FBFBF4;--white:#FFFFFF;--line:#C9D6CF;--turq:#00B1B0;--t-turq:#D9F3F2;--t-rose:#FFE1EB;--t-coral:#FFE6E0;--t-sage:#E3ECE7;--coral:#FF8370;--page:#E7F4F5}
+*{box-sizing:border-box}
+html,body{margin:0;padding:0}
+body{background:var(--page);color:var(--ink);font-family:Poppins,system-ui,-apple-system,"Segoe UI",sans-serif;-webkit-font-smoothing:antialiased}
+#shell{max-width:420px;min-height:100vh;margin:0 auto;background:var(--ground);display:flex;flex-direction:column;box-shadow:0 0 40px rgba(9,55,31,.12)}
+#banner{background:var(--ink);color:#fff;font-size:12px;line-height:1.4;padding:8px 16px;text-align:center}
+#app{flex:1;display:flex;flex-direction:column;gap:16px;padding:24px 20px 20px}
+.kicker{margin:0;font-size:12px;font-weight:600;letter-spacing:.05em;text-transform:uppercase;color:var(--ink2)}
+h1{margin:0;font-size:25px;line-height:1.25;font-weight:700}
+h2{margin:0;font-size:18px;font-weight:700}
+p{margin:0}
+.lead{font-size:14px;line-height:1.55;color:var(--ink2)}
+.small{font-size:12.5px;line-height:1.5;color:var(--ink2)}
+.stack{display:flex;flex-direction:column;gap:10px}
+.grow{flex:1}
+button{font-family:inherit;color:var(--ink);cursor:pointer}
+.btn{min-height:54px;border-radius:27px;border:none;background:var(--ink);color:#fff;font-size:16px;font-weight:600;padding:0 20px;width:100%;display:flex;align-items:center;justify-content:center;text-decoration:none}
+.btn[disabled]{background:#9DB3A8;cursor:default}
+.btn.ghost{background:var(--ground);color:var(--ink);border:2px solid var(--ink)}
+.link{background:none;border:none;padding:10px 0;font-size:13px;font-weight:600;text-decoration:underline;min-height:44px;color:var(--ink)}
+.opt{min-height:60px;border-radius:16px;border:1px solid var(--line);background:var(--white);padding:10px 14px;display:flex;align-items:center;gap:12px;text-align:left;font-size:15px;font-weight:500;line-height:1.35;width:100%}
+.opt.on{border:2px solid var(--ink);background:var(--t-turq);font-weight:600}
+.opt svg{flex-shrink:0}
+.bar{height:8px;border-radius:4px;background:var(--t-sage);overflow:hidden}
+.bar>i{display:block;height:8px;border-radius:4px;background:var(--turq)}
+.card{border-radius:20px;border:1px solid var(--line);background:var(--white);padding:16px}
+.tint{border-radius:20px;background:var(--t-turq);padding:16px 18px}
+.row{display:flex;align-items:center;gap:12px}
+.chips{display:flex;gap:8px;flex-wrap:wrap}
+.chip{min-height:30px;padding:4px 12px;border-radius:15px;background:var(--t-sage);display:inline-flex;align-items:center;font-size:12px;font-weight:600}
+.chip.coral{background:var(--t-coral)}
+.check{min-height:52px;border-radius:14px;border:1px solid var(--line);background:var(--white);padding:8px 14px;display:flex;align-items:center;gap:12px;font-size:14px;font-weight:500;line-height:1.35;cursor:pointer}
+.check.on{background:var(--t-turq);border-color:var(--t-turq)}
+.check input{width:22px;height:22px;accent-color:var(--ink);flex-shrink:0}
+.cards{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px}
+.pick{position:relative;min-height:150px;border-radius:18px;border:1px solid var(--line);padding:12px 6px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:8px}
+.pick.on{outline:3px solid var(--ink);outline-offset:1px}
+.pick b{font-size:14px;font-weight:600;line-height:1.25}
+@keyframes flip{from{transform:rotateY(90deg) scale(.7)}to{transform:none}}
+@keyframes pulse{from{transform:scale(.86)}to{transform:scale(1)}}
+.tile.flip{animation:flip .55s ease-out}
+.tile.pend{border:none;padding:0;cursor:pointer;background:#FF8370;border-radius:50%;animation:pulse .7s ease-in-out infinite alternate}
+@media (prefers-reduced-motion:reduce){.tile.flip,.tile.pend{animation:none}}
+.mosaic{display:grid;grid-template-columns:repeat(7,minmax(0,1fr));gap:3px;border-radius:12px;overflow:hidden}
+.mosaic.full{gap:0}
+.tile{aspect-ratio:1;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:600;color:#3E5C4C;background:#EEF2E8;border-radius:5px}
+.tile.now{outline:3px solid var(--ink);outline-offset:-3px;background:#D9F3F2}
+.tile.on{background-image:url("data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 700 300%22%3E%3Crect width=%22700%22 height=%22300%22 fill=%22%2312455A%22/%3E%3Ccircle cx=%2240%22 cy=%2240%22 r=%225%22 fill=%22%23FEC84D%22/%3E%3Ccircle cx=%2295%22 cy=%22120%22 r=%223%22 fill=%22%23FBFBF4%22/%3E%3Ccircle cx=%22160%22 cy=%2230%22 r=%224%22 fill=%22%23FBFBF4%22/%3E%3Ccircle cx=%22215%22 cy=%2295%22 r=%225%22 fill=%22%23FEC84D%22/%3E%3Ccircle cx=%22270%22 cy=%2235%22 r=%223%22 fill=%22%23FBFBF4%22/%3E%3Ccircle cx=%22330%22 cy=%22110%22 r=%224%22 fill=%22%23FBFBF4%22/%3E%3Ccircle cx=%22390%22 cy=%2225%22 r=%225%22 fill=%22%23FEC84D%22/%3E%3Ccircle cx=%22445%22 cy=%2290%22 r=%223%22 fill=%22%23FBFBF4%22/%3E%3Ccircle cx=%22500%22 cy=%2240%22 r=%224%22 fill=%22%23FBFBF4%22/%3E%3Ccircle cx=%22545%22 cy=%22130%22 r=%224%22 fill=%22%23FEC84D%22/%3E%3Ccircle cx=%22660%22 cy=%22150%22 r=%224%22 fill=%22%23FBFBF4%22/%3E%3Ccircle cx=%22665%22 cy=%2235%22 r=%223%22 fill=%22%23FBFBF4%22/%3E%3Ccircle cx=%2260%22 cy=%22165%22 r=%223%22 fill=%22%23FEC84D%22/%3E%3Ccircle cx=%22240%22 cy=%22150%22 r=%223%22 fill=%22%23FBFBF4%22/%3E%3Ccircle cx=%22470%22 cy=%22150%22 r=%223%22 fill=%22%23FBFBF4%22/%3E%3Ccircle cx=%22120%22 cy=%2270%22 r=%223%22 fill=%22%23FEC84D%22/%3E%3Ccircle cx=%22600%22 cy=%2275%22 r=%2246%22 fill=%22%23FEC84D%22/%3E%3Ccircle cx=%22580%22 cy=%2262%22 r=%2240%22 fill=%22%2312455A%22/%3E%3Cpath d=%22M110 62a16 16 0 0 1 30-6 14 14 0 0 1 26 8 12 12 0 0 1-4 23h-50a13 13 0 0 1-2-25z%22 fill=%22%23FF7FA8%22/%3E%3Cpath d=%22M352 58a14 14 0 0 1 27-5 12 12 0 0 1 22 7 10 10 0 0 1-3 20h-44a11 11 0 0 1-2-22z%22 fill=%22%23FFB3A4%22/%3E%3Cpath d=%22M0 300V222Q120 160 250 216T480 208T700 186V300Z%22 fill=%22%2300B1B0%22/%3E%3Cpath d=%22M90 214v-34%22 stroke=%22%2309371F%22 stroke-width=%228%22 stroke-linecap=%22round%22/%3E%3Ccircle cx=%2290%22 cy=%22162%22 r=%2228%22 fill=%22%2309371F%22/%3E%3Ccircle cx=%2280%22 cy=%22156%22 r=%224%22 fill=%22%23FEC84D%22/%3E%3Ccircle cx=%22100%22 cy=%22170%22 r=%224%22 fill=%22%23FF8370%22/%3E%3Crect x=%22296%22 y=%22168%22 width=%2264%22 height=%2248%22 fill=%22%23FBFBF4%22/%3E%3Cpath d=%22M286 170l42-34 42 34z%22 fill=%22%23FF8370%22/%3E%3Crect x=%22306%22 y=%22180%22 width=%2218%22 height=%2218%22 fill=%22%23FEC84D%22/%3E%3Crect x=%22334%22 y=%22186%22 width=%2216%22 height=%2230%22 fill=%22%2309371F%22/%3E%3Cpath d=%22M370 150q6-10 12 0M388 132q8-12 16 0%22 stroke=%22%23FBFBF4%22 stroke-width=%224%22 fill=%22none%22 stroke-linecap=%22round%22/%3E%3Cpath d=%22M520 206l24-40 24 40z%22 fill=%22%23FF8370%22/%3E%3Cpath d=%22M544 166v40%22 stroke=%22%2309371F%22 stroke-width=%224%22/%3E%3Cpath d=%22M0 300V262Q200 204 400 262T700 244V300Z%22 fill=%22%23008A89%22/%3E%3Ccircle cx=%2240%22 cy=%22272%22 r=%225%22 fill=%22%23FF7FA8%22/%3E%3Ccircle cx=%22140%22 cy=%22258%22 r=%225%22 fill=%22%23FEC84D%22/%3E%3Ccircle cx=%22230%22 cy=%22262%22 r=%225%22 fill=%22%23FBFBF4%22/%3E%3Ccircle cx=%22330%22 cy=%22276%22 r=%225%22 fill=%22%23FF7FA8%22/%3E%3Ccircle cx=%22430%22 cy=%22280%22 r=%225%22 fill=%22%23FEC84D%22/%3E%3Ccircle cx=%22520%22 cy=%22268%22 r=%225%22 fill=%22%23FBFBF4%22/%3E%3Ccircle cx=%22610%22 cy=%22262%22 r=%225%22 fill=%22%23FF7FA8%22/%3E%3Ccircle cx=%22670%22 cy=%22270%22 r=%225%22 fill=%22%23FEC84D%22/%3E%3C/svg%3E");background-size:700% 300%;border-radius:2px}
+.mosaic.full .tile.on{border-radius:0}
+.pick svg{width:72px;height:72px}
+.pick svg,.anim svg{overflow:visible}
+.anim{display:flex;justify-content:center;border-radius:16px;padding:12px}
+.anim svg{width:128px;height:128px}
+@keyframes fa{0%,49.9%{opacity:1}50%,100%{opacity:0}}
+@keyframes fb{0%,49.9%{opacity:0}50%,100%{opacity:1}}
+@keyframes rock{from{transform:rotate(-7deg)}to{transform:rotate(7deg)}}
+@keyframes rise{from{transform:translateY(0)}to{transform:translateY(-6px)}}
+@keyframes puff{from{opacity:0}to{opacity:1}}
+.fa{animation:fa 1.4s linear infinite}
+.fb{opacity:0;animation:fb 1.4s linear infinite}
+.rock{transform-box:view-box;transform-origin:32px 44px;animation:rock 1.6s ease-in-out infinite alternate}
+.rise{animation:rise 2s ease-in-out infinite alternate}
+.puff{animation:puff 2s ease-in-out infinite alternate}
+.fb-only .fa{animation:none;opacity:0}.fb-only .fb{animation:none;opacity:1}.fb-only .rock{animation:none;transform:rotate(7deg)}.fb-only .rise{animation:none;transform:translateY(-6px)}.fb-only .puff{animation:none;opacity:1}
+@media (prefers-reduced-motion:reduce){.fa,.fb,.rock,.rise,.puff{animation:none}}
+.pick em{font-style:normal;font-size:11px;font-weight:600;letter-spacing:.05em;text-transform:uppercase}
+.days{display:grid;grid-template-columns:repeat(7,minmax(0,1fr));gap:8px}
+.day{display:flex;flex-direction:column;align-items:center;gap:4px;font-size:11px;font-weight:600;color:var(--ink2)}
+.dot{width:36px;height:36px;border-radius:18px;display:flex;align-items:center;justify-content:center}
+.dot.todo{border:2px dashed #9DB3A8}
+.dot.now{border:3px solid var(--ink);background:var(--t-turq)}
+.meter{display:grid;grid-template-columns:64px minmax(0,1fr) auto;align-items:center;gap:10px;font-size:13px}
+.meter .track{height:12px;border-radius:6px;background:var(--white);overflow:hidden}
+.meter .track i{display:block;height:12px;border-radius:6px;background:var(--ink)}
+.meter span:last-child{white-space:nowrap}
+textarea{border-radius:16px;border:1px solid #9DB3A8;background:var(--white);padding:14px;font-family:inherit;font-size:14px;line-height:1.5;color:var(--ink);resize:none;width:100%}
+label.t{font-size:15px;font-weight:700}
+#tabs{position:sticky;bottom:0;display:grid;grid-template-columns:repeat(3,minmax(0,1fr));background:var(--white);border-top:1px solid var(--line)}
+#tabs button{min-height:60px;border:none;background:none;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px;font-size:11px;font-weight:600;color:var(--ink2)}
+#tabs button.on{color:var(--ink);box-shadow:inset 0 3px 0 var(--turq)}
+#toast{position:fixed;left:50%;bottom:84px;transform:translateX(-50%);background:var(--ink);color:#fff;font-size:13px;font-weight:600;padding:10px 16px;border-radius:20px;opacity:0;transition:opacity .25s;pointer-events:none;white-space:nowrap}
+#toast.show{opacity:1}
+button:focus-visible,a:focus-visible,input:focus-visible,textarea:focus-visible{outline:3px solid var(--turq);outline-offset:2px}
+</style>
+</head>
+<body>
+<div id="shell">
+  <div id="banner">Démo : rien n'est enregistré ni envoyé. Les gestes sont des exemples à remplacer par ceux de Sandy.</div>
+  <main id="app"></main>
+  <nav id="tabs" hidden></nav>
+</div>
+<div id="toast" role="status"></div>
+<pre id="selftest" hidden></pre>
+<script>
+var IC = {
+  check:'<svg aria-hidden="true" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#09371F" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M8 12.5l3 3 5-6"/></svg>',
+  ring:'<svg aria-hidden="true" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#6E8579" stroke-width="2"><circle cx="12" cy="12" r="9"/></svg>',
+  clock:'<svg aria-hidden="true" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#09371F" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg>',
+  cards:'<svg aria-hidden="true" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#09371F" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="3" width="12" height="16" rx="2"/><path d="M8 21h10a2 2 0 0 0 2-2V8"/></svg>',
+  list:'<svg aria-hidden="true" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#09371F" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 6h11M9 12h11M9 18h11"/><path d="M4 6l1 1 2-2M4 12l1 1 2-2M4 18l1 1 2-2"/></svg>',
+  chat:'<svg aria-hidden="true" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12a8 8 0 0 1-12 7l-5 1 1-4a8 8 0 1 1 16-4z"/></svg>',
+  bell:'<svg aria-hidden="true" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#09371F" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 9a6 6 0 1 1 12 0c0 6 2 7 2 7H4s2-1 2-7"/><path d="M10 20a2 2 0 0 0 4 0"/></svg>',
+  star:'<svg aria-hidden="true" width="20" height="20" viewBox="0 0 24 24" fill="#09371F" stroke="#09371F" stroke-width="1.5" stroke-linejoin="round"><path d="M12 3l2.6 5.6 6 .7-4.4 4.2 1.2 6-5.4-3-5.4 3 1.2-6L3.4 9.3l6-.7z"/></svg>',
+  today:'<svg aria-hidden="true" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 14a8 8 0 1 1-9-10 6 6 0 0 0 9 10z"/></svg>',
+  grid:'<svg aria-hidden="true" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="17" rx="2"/><path d="M3 9h18M8 2v4M16 2v4"/></svg>',
+  play:'<svg aria-hidden="true" width="18" height="18" viewBox="0 0 24 24" fill="#FFFFFF"><path d="M8 5l12 7-12 7z"/></svg>',
+  mur:'<svg aria-hidden="true" width="64" height="64" viewBox="0 0 64 64" fill="none" stroke="#09371F" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M4 60h56" stroke-width="2.5"/><path d="M54 6v54" stroke-width="5"/><g class="fa"><circle cx="30" cy="17" r="5.5" fill="#FFFFFF"/><path d="M32 23l-8 19M31 27l11 4 10-6M31 30l10 6 11-4M24 42l-8 17M24 42l5 17"/></g><g class="fb"><circle cx="26" cy="20" r="5.5" fill="#FFFFFF"/><path d="M28 26L18 43M27 29l25-5M27 32h25M18 43L8 59M18 43l4 16"/><path d="M58 13l4-3M59 21h4M58 29l4 3" stroke="#FC3C80" stroke-width="2.5"/></g></svg>',
+  kangourou:'<svg aria-hidden="true" width="64" height="64" viewBox="0 0 64 64" fill="none" stroke="#09371F" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M4 60h56" stroke-width="2.5"/><g class="fa"><circle cx="32" cy="27" r="5.5" fill="#FFFFFF"/><path d="M32 33v12M32 37l-9 8M32 37l9 8M32 45l-9 5 4 9M32 45l9 5-4 9"/></g><g class="fb"><circle cx="32" cy="9" r="5.5" fill="#FFFFFF"/><path d="M32 15v17M32 20L21 10M32 20l11-10M32 32l-6 9 3 8M32 32l6 9-3 8"/><path d="M24 53v4M32 52v5M40 53v4" stroke="#FC3C80" stroke-width="2.5"/></g></svg>',
+  sandwich:'<svg aria-hidden="true" width="64" height="64" viewBox="0 0 64 64" fill="none" stroke="#09371F" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M4 56h56" stroke-width="2.5"/><circle cx="11" cy="45" r="5.5" fill="#FFFFFF"/><path d="M18 49h38"/><rect x="21" y="31" width="33" height="13" rx="6.5" fill="#FFFFFF"/><g class="fa"><path d="M29 9v11M25 16l4 5 4-5" stroke="#FC3C80" stroke-width="2.5"/></g><g class="fb"><path d="M46 9v11M42 16l4 5 4-5" stroke="#FC3C80" stroke-width="2.5"/></g></svg>',
+  bercement:'<svg aria-hidden="true" width="64" height="64" viewBox="0 0 64 64" fill="none" stroke="#09371F" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M4 60h56" stroke-width="2.5"/><circle cx="32" cy="44" r="15" fill="#FFFFFF"/><g class="rock"><circle cx="10" cy="23" r="5.5" fill="#FFFFFF"/><path d="M16 26c10 1 26 0 38 8"/></g><path d="M22 9c7-4 13-4 20 0M22 9l1 5M22 9l5-1M42 9l-1 5M42 9l-5-1" stroke="#FC3C80" stroke-width="2.5"/></svg>',
+  bougie:'<svg aria-hidden="true" width="64" height="64" viewBox="0 0 64 64" fill="none" stroke="#09371F" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M4 57h56" stroke-width="2.5"/><circle cx="11" cy="46" r="5.5" fill="#FFFFFF"/><path d="M18 50h38"/><g class="rise"><circle cx="36" cy="39" r="7" fill="#FFFFFF"/><circle cx="31" cy="32" r="2.5" fill="#FFFFFF"/><circle cx="41" cy="32" r="2.5" fill="#FFFFFF"/></g><path class="puff" d="M36 19V7M32 11l4-5 4 5" stroke="#FC3C80" stroke-width="2.5"/></svg>',
+  cocon:'<svg aria-hidden="true" width="64" height="64" viewBox="0 0 64 64" fill="none" stroke="#09371F" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M4 56h56" stroke-width="2.5"/><circle cx="11" cy="37" r="5.5" fill="#FFFFFF"/><rect x="18" y="25" width="40" height="24" rx="12" fill="#FFFFFF"/><path d="M28 25v24M38 25v24M48 25v24" stroke-width="2.5"/><g class="fa"><path d="M31 1v11M27 8l4 5 4-5" stroke="#FC3C80" stroke-width="2.5"/><path d="M45 1v11M41 8l4 5 4-5" stroke="#FC3C80" stroke-width="2.5"/></g><g class="fb"><path d="M31 8v11M27 15l4 5 4-5" stroke="#FC3C80" stroke-width="2.5"/><path d="M45 8v11M41 15l4 5 4-5" stroke="#FC3C80" stroke-width="2.5"/></g></svg>'
+};
+var PROGS = {
+  soir:{name:'Le programme du soir',why:'des signes autour du coucher : il décharge, il négocie, il sursaute. C\'est souvent un corps qui n\'a pas pu décharger.',chip:'Le soir'},
+  bouche:{name:'Le programme bouche',why:'des signes autour de la bouche : ongles, stylos, pouce. C\'est souvent le même signal.',chip:'La bouche'},
+  devoirs:{name:'Le programme devoirs',why:'des signes à la table des devoirs : posture, crayon, chaise. Tenir assis lui coûte cher.',chip:'Les devoirs'},
+  motricite:{name:'Le programme motricité',why:'des signes dans ses mouvements : il se cogne, il évite le vélo, il s\'assoit en W.',chip:'La motricité'}
+};
+var ORDER = ['soir','bouche','devoirs','motricite'];
+var QUIZ = [
+  {k:'Le soir',t:'Entre 18 h et 20 h, ton MINI, c\'est plutôt…',multi:true,o:[['Il court, il saute, il grimpe partout','soir'],['Il négocie chaque étape du coucher','soir'],['Une fois couché, il sursaute au moindre bruit','soir'],['Rien de tout ça, il se pose tout seul',null]]},
+  {k:'Les devoirs',t:'À la table des devoirs, tu vois…',multi:true,o:[['Il s\'affale, la tête sur le bras','devoirs'],['Il se tortille, il glisse de sa chaise','devoirs'],['Il serre son crayon à trouer la feuille','devoirs'],['Rien de tout ça',null]]},
+  {k:'La bouche',t:'Ce qu\'il met à la bouche…',multi:true,o:[['Il se ronge les ongles','bouche'],['Il mâchouille ses stylos ou son col','bouche'],['Il suce encore son pouce','bouche'],['Rien de tout ça',null]]},
+  {k:'Le mouvement',t:'Quand il bouge…',multi:true,o:[['Il se cogne, il renverse son verre','motricite'],['Il évite le vélo ou le ballon','motricite'],['Il s\'assoit souvent en W','motricite'],['Il est à l\'aise dans son corps',null]]},
+  {k:'La nuit',t:'Et une fois la lumière éteinte…',multi:true,o:[['Il ne s\'endort que si tu restes','soir'],['Il se réveille en sursaut','soir'],['Il dort les bras en croix, se découvre','soir'],['Il dort bien',null]]},
+  {k:'Ta priorité',t:'Ce qui te pèse le plus en ce moment…',multi:false,w:2,o:[['Les soirées et le coucher','soir'],['Les devoirs','devoirs'],['Ce qu\'il met à la bouche','bouche'],['Sa maladresse','motricite']]}
+];
+var GRID = ['Plus il est fatigué, plus il bouge','Il négocie chaque étape : eau, histoire, porte','Il pleure pour un rien à la lumière éteinte','Une fois couché, il sursaute au moindre bruit','Il dort les bras en croix, se réveille en sursaut','Il lui faut un contact fort pour s\'endormir','Le matin, il est très difficile à réveiller'];
+var CARDS = {
+  mur:{need:'Pour décharger',tint:'#D9F3F2',title:'Le mur qui tombe',txt:'Mains à plat sur le mur, pieds bien en arrière. Il pousse de toutes ses forces pendant que tu comptes jusqu\'à 10. Trois fois. Toi, tu joues le mur qui penche.',meta:['1 minute','Dès 3 ans','Un mur'],why:'Pousser contre quelque chose qui ne bouge pas donne au corps une information simple : « je suis là, je suis solide ».',hot:'Raccourcis, baisse la voix et enchaîne avec le sandwich ou le cocon plutôt que de supprimer la carte.',stop:'Ça tire dans les poignets, ou il dit stop.'},
+  kangourou:{need:'Pour décharger',tint:'#D9F3F2',title:'Le kangourou',txt:'Il saute sur place 10 fois, puis d\'un coussin au tapis. Tu comptes à voix haute, il termine en statue.',meta:['1 minute','Dès 3 ans','Un coussin'],why:'Un corps qui n\'a pas déchargé a du mal à redescendre. Il a besoin de décharger avant de pouvoir se calmer.',hot:'Fais moins de sauts et passe tout de suite au sandwich ou au cocon.',stop:'Il se fait mal, ou il dit stop.'},
+  sandwich:{need:'Pour s\'apaiser',tint:'#FFE1EB',title:'Le sandwich',txt:'À plat ventre, un coussin sur le dos et les jambes. Mains à plat, tu appuies lentement des épaules vers les pieds, 10 fois. Jamais sur la tête ni la nuque.',meta:['1 min 30','Dès 3 ans','Un coussin'],why:'Une pression lente et franche donne au corps des repères. C\'est ce qu\'il cherche quand il veut la couette bien serrée.',hot:'Si ça chatouille, c\'est trop léger : plus franc, plus lent. C\'est lui qui dit « plus fort » ou « moins fort ».',stop:'Il se raidit, ou il n\'a pas envie d\'être touché ce soir.'},
+  cocon:{need:'Pour s\'apaiser',tint:'#FFE1EB',title:'Le cocon',txt:'Tu l\'enroules dans la couette, bras le long du corps, tête libre. Tes mains à plat sur ses épaules, 10 secondes, sans parler.',meta:['30 secondes','Dès 3 ans','La couette'],why:'Un corps contenu est souvent un corps qui peut lâcher.',hot:'Desserre, laisse-le s\'enrouler lui-même, puis tu fermes le cocon.',stop:'Il veut sortir : on ouvre tout de suite.'},
+  bercement:{need:'Pour se sentir en sécurité',tint:'#FFE6E0',title:'Le bercement',txt:'À plat ventre sur le gros ballon, tu tiens ses hanches. Tu le balances lentement d\'avant en arrière, un balancement par seconde. Lumière basse, pas un mot.',meta:['2 minutes','Dès 3 ans','Un gros ballon'],why:'Ce rythme lent ressemble au bercement qui rassure un tout-petit. Il peut aider son corps à se sentir en sécurité.',hot:'Deux minutes de rebonds d\'abord, puis « maintenant, le bateau » : plus lent, plus bas.',stop:'Tête qui tourne, nausée, ou il le demande.'},
+  bougie:{need:'Pour passer en mode nuit',tint:'#E3ECE7',title:'La bougie',txt:'Sur le dos, une peluche sur le ventre. Il la fait monter en inspirant par le nez, descendre en soufflant tout doucement, comme pour faire bouger une bougie sans l\'éteindre. 6 à 8 fois.',meta:['1 minute','Dès 3 ans','Une peluche'],why:'Une expiration longue est le signal le plus simple pour dire au corps que la journée est finie.',hot:'Souffle avec lui, c\'est un jeu à deux. S\'il rigole, c\'est bien.',stop:'Tête qui tourne : on respire normalement.'}
+};
+var SETS = [['mur','sandwich','bercement'],['kangourou','cocon','bougie'],['mur','cocon','bercement'],['kangourou','sandwich','bougie']];
+var NEEDCOLOR = {'Pour décharger':'#00B1B0','Pour s\'apaiser':'#FF7FA8','Pour se sentir en sécurité':'#FF8370','Pour passer en mode nuit':'#8FB3A2'};
+var SCENE = 'data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 700 300%22%3E%3Crect width=%22700%22 height=%22300%22 fill=%22%2312455A%22/%3E%3Ccircle cx=%2240%22 cy=%2240%22 r=%225%22 fill=%22%23FEC84D%22/%3E%3Ccircle cx=%2295%22 cy=%22120%22 r=%223%22 fill=%22%23FBFBF4%22/%3E%3Ccircle cx=%22160%22 cy=%2230%22 r=%224%22 fill=%22%23FBFBF4%22/%3E%3Ccircle cx=%22215%22 cy=%2295%22 r=%225%22 fill=%22%23FEC84D%22/%3E%3Ccircle cx=%22270%22 cy=%2235%22 r=%223%22 fill=%22%23FBFBF4%22/%3E%3Ccircle cx=%22330%22 cy=%22110%22 r=%224%22 fill=%22%23FBFBF4%22/%3E%3Ccircle cx=%22390%22 cy=%2225%22 r=%225%22 fill=%22%23FEC84D%22/%3E%3Ccircle cx=%22445%22 cy=%2290%22 r=%223%22 fill=%22%23FBFBF4%22/%3E%3Ccircle cx=%22500%22 cy=%2240%22 r=%224%22 fill=%22%23FBFBF4%22/%3E%3Ccircle cx=%22545%22 cy=%22130%22 r=%224%22 fill=%22%23FEC84D%22/%3E%3Ccircle cx=%22660%22 cy=%22150%22 r=%224%22 fill=%22%23FBFBF4%22/%3E%3Ccircle cx=%22665%22 cy=%2235%22 r=%223%22 fill=%22%23FBFBF4%22/%3E%3Ccircle cx=%2260%22 cy=%22165%22 r=%223%22 fill=%22%23FEC84D%22/%3E%3Ccircle cx=%22240%22 cy=%22150%22 r=%223%22 fill=%22%23FBFBF4%22/%3E%3Ccircle cx=%22470%22 cy=%22150%22 r=%223%22 fill=%22%23FBFBF4%22/%3E%3Ccircle cx=%22120%22 cy=%2270%22 r=%223%22 fill=%22%23FEC84D%22/%3E%3Ccircle cx=%22600%22 cy=%2275%22 r=%2246%22 fill=%22%23FEC84D%22/%3E%3Ccircle cx=%22580%22 cy=%2262%22 r=%2240%22 fill=%22%2312455A%22/%3E%3Cpath d=%22M110 62a16 16 0 0 1 30-6 14 14 0 0 1 26 8 12 12 0 0 1-4 23h-50a13 13 0 0 1-2-25z%22 fill=%22%23FF7FA8%22/%3E%3Cpath d=%22M352 58a14 14 0 0 1 27-5 12 12 0 0 1 22 7 10 10 0 0 1-3 20h-44a11 11 0 0 1-2-22z%22 fill=%22%23FFB3A4%22/%3E%3Cpath d=%22M0 300V222Q120 160 250 216T480 208T700 186V300Z%22 fill=%22%2300B1B0%22/%3E%3Cpath d=%22M90 214v-34%22 stroke=%22%2309371F%22 stroke-width=%228%22 stroke-linecap=%22round%22/%3E%3Ccircle cx=%2290%22 cy=%22162%22 r=%2228%22 fill=%22%2309371F%22/%3E%3Ccircle cx=%2280%22 cy=%22156%22 r=%224%22 fill=%22%23FEC84D%22/%3E%3Ccircle cx=%22100%22 cy=%22170%22 r=%224%22 fill=%22%23FF8370%22/%3E%3Crect x=%22296%22 y=%22168%22 width=%2264%22 height=%2248%22 fill=%22%23FBFBF4%22/%3E%3Cpath d=%22M286 170l42-34 42 34z%22 fill=%22%23FF8370%22/%3E%3Crect x=%22306%22 y=%22180%22 width=%2218%22 height=%2218%22 fill=%22%23FEC84D%22/%3E%3Crect x=%22334%22 y=%22186%22 width=%2216%22 height=%2230%22 fill=%22%2309371F%22/%3E%3Cpath d=%22M370 150q6-10 12 0M388 132q8-12 16 0%22 stroke=%22%23FBFBF4%22 stroke-width=%224%22 fill=%22none%22 stroke-linecap=%22round%22/%3E%3Cpath d=%22M520 206l24-40 24 40z%22 fill=%22%23FF8370%22/%3E%3Cpath d=%22M544 166v40%22 stroke=%22%2309371F%22 stroke-width=%224%22/%3E%3Cpath d=%22M0 300V262Q200 204 400 262T700 244V300Z%22 fill=%22%23008A89%22/%3E%3Ccircle cx=%2240%22 cy=%22272%22 r=%225%22 fill=%22%23FF7FA8%22/%3E%3Ccircle cx=%22140%22 cy=%22258%22 r=%225%22 fill=%22%23FEC84D%22/%3E%3Ccircle cx=%22230%22 cy=%22262%22 r=%225%22 fill=%22%23FBFBF4%22/%3E%3Ccircle cx=%22330%22 cy=%22276%22 r=%225%22 fill=%22%23FF7FA8%22/%3E%3Ccircle cx=%22430%22 cy=%22280%22 r=%225%22 fill=%22%23FEC84D%22/%3E%3Ccircle cx=%22520%22 cy=%22268%22 r=%225%22 fill=%22%23FBFBF4%22/%3E%3Ccircle cx=%22610%22 cy=%22262%22 r=%225%22 fill=%22%23FF7FA8%22/%3E%3Ccircle cx=%22670%22 cy=%22270%22 r=%225%22 fill=%22%23FEC84D%22/%3E%3C/svg%3E';
+var S;
+function reset(){ S={screen:'accueil',q:0,answers:[[],[],[],[],[],[]],grid1:[],grid7:[],grid14:[],grid21:[],saved7:false,saved14:false,day:1,done:{},pending:null,lastFlip:null,picked:null,sent:false,draft:''}; }
+function scores(){ var sc={soir:0,bouche:0,devoirs:0,motricite:0}; QUIZ.forEach(function(q,i){ S.answers[i].forEach(function(j){ var p=q.o[j][1]; if(p) sc[p]+=(q.w||1); }); }); return sc; }
+function topProg(){ var sc=scores(), best='soir', max=-1; ORDER.forEach(function(p){ if(sc[p]>max){max=sc[p];best=p;} }); return {key:best,max:max,sc:sc}; }
+function toast(m){ var t=document.getElementById('toast'); t.textContent=m; t.classList.add('show'); clearTimeout(toast._t); toast._t=setTimeout(function(){t.classList.remove('show');},1800); }
+function go(s){ S.screen=s; render(); window.scrollTo(0,0); }
+function has(a,v){ return a.indexOf(v)>=0; }
+function toggle(a,v){ var i=a.indexOf(v); if(i>=0) a.splice(i,1); else a.push(v); }
+function dueCheck(){ if(S.done[S.day]){ if(S.day===7 && !S.saved7) return 7; if(S.day===14 && !S.saved14) return 14; } return 0; }
+function meterRow(label,set,saved,day){ var txt; if(saved){ txt=set.length+' sur '+GRID.length; } else if(S.day<day){ txt='dans '+(day-S.day)+(day-S.day>1?' jours':' jour'); } else if(S.day===day){ txt='ce soir'; } else { txt='pas fait'; } return '<div class="meter"><b>'+label+'</b><div class="track">'+(saved?'<i style="width:'+Math.round(set.length/GRID.length*100)+'%"></i>':'')+'</div><span>'+txt+'</span></div>'; }
+function act(name,arg){
+  if(name==='start'){ go('quiz'); }
+  else if(name==='opt'){ var q=QUIZ[S.q], a=S.answers[S.q]; if(q.multi){ var none=q.o[arg][1]===null; if(none){ S.answers[S.q]=has(a,arg)?[]:[arg]; } else { S.answers[S.q]=a.filter(function(j){return q.o[j][1]!==null;}); toggle(S.answers[S.q],arg); } } else { S.answers[S.q]=[arg]; } render(); }
+  else if(name==='next'){ if(S.q<QUIZ.length-1){ S.q++; go('quiz'); } else go('resultat'); }
+  else if(name==='prev'){ if(S.q>0){ S.q--; go('quiz'); } else go('accueil'); }
+  else if(name==='toGrid'){ go('grille'); }
+  else if(name==='g1'){ toggle(S.grid1,arg); render(); }
+  else if(name==='saveG1'){ S.day=1; S.picked=null; go('jour'); toast('Grille du jour 1 enregistrée'); }
+  else if(name==='pick'){ S.picked=arg; render(); }
+  else if(name==='done'){ if(!S.picked) return; S.done[S.day]=S.picked; S.pending=S.day; S.picked=null; go('suivi'); }
+  else if(name==='flip'){ if(S.pending!==arg) return; S.pending=null; S.lastFlip=arg; render(); toast(Object.keys(S.done).length===21?'Le tableau est complet':'Un morceau de plus'); }
+  else if(name==='nextDay'){ S.pending=null; var due=dueCheck(); if(S.saved21){ go('bilan'); } else if(due){ go('grille'+due); } else if(!S.done[S.day] && S.day<21){ S.picked=null; go('jour'); } else if(S.day<21){ S.day++; S.picked=null; go('jour'); } else go('grille21'); }
+  else if(name==='g7'){ toggle(S.grid7,arg); render(); }
+  else if(name==='g14'){ toggle(S.grid14,arg); render(); }
+  else if(name==='saveG7'){ S.saved7=true; go('suivi'); toast('Point de la semaine enregistré'); }
+  else if(name==='saveG14'){ S.saved14=true; go('suivi'); toast('Point de la semaine enregistré'); }
+  else if(name==='jump21'){ S.pending=null; for(var d=1; d<=20; d++){ if(!S.done[d]) S.done[d]=SETS[(d-1)%4][d%3]; } if(!S.saved7){ S.grid7=S.grid1.slice(); S.saved7=true; } if(!S.saved14){ S.grid14=S.grid1.slice(0,Math.max(S.grid1.length-1,0)); S.saved14=true; } S.day=21; S.picked=null; go('grille21'); }
+  else if(name==='g21'){ toggle(S.grid21,arg); render(); }
+  else if(name==='saveG21'){ S.done[21]=S.done[21]||'bougie'; S.saved21=true; go('bilan'); }
+  else if(name==='tab'){ go(arg); }
+  else if(name==='send'){ var ta=document.getElementById('q'); S.draft=ta?ta.value.trim():S.draft; if(!S.draft){ toast('Écris ta question d\'abord'); return; } S.sent=true; render(); }
+  else if(name==='again'){ S.sent=false; S.draft=''; render(); }
+  else if(name==='reset'){ reset(); go('accueil'); }
+}
+function vAccueil(){ return '<p class="kicker">Sandy · ABC des réflexes</p><h1>Le programme du soir en 21 jours</h1><p class="lead">Ton enfant décharge à fond le soir, le coucher s\'éternise, ça négocie, ça pleure pour un rien. Tu n\'as rien à lire : ton enfant choisit chaque soir une carte qui se fait en sept minutes.</p>'
+  +'<div class="tint stack" style="gap:14px"><div class="row">'+IC.list+'<b style="font-size:15px">Un repérage en 6 questions</b></div><div class="row">'+IC.cards+'<b style="font-size:15px">Ton MINI choisit un geste par jour</b></div><div class="row">'+IC.clock+'<b style="font-size:15px">Une grille refaite tous les 7 jours</b></div><div class="row" style="color:#09371F">'+IC.chat+'<b style="font-size:15px">Sandy répond à une question par semaine</b></div></div>'
+  +'<div class="card"><p style="font-size:13px;font-weight:600;margin-bottom:6px">Ce que ce programme n\'est pas</p><p class="small">Ni un diagnostic, ni un traitement, ni une promesse. Des gestes doux, en plus de ce que font déjà les professionnels autour de ton enfant.</p></div>'
+  +'<div class="grow"></div><button class="btn" data-a="start">Commencer le repérage</button>'; }
+function vQuiz(){ var q=QUIZ[S.q], a=S.answers[S.q], pct=Math.round((S.q+1)/QUIZ.length*100);
+  var h='<div class="row"><button class="opt" data-a="prev" aria-label="Question précédente" style="width:44px;min-height:44px;height:44px;border-radius:22px;padding:0;justify-content:center"><svg aria-hidden="true" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#09371F" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 6l-6 6 6 6"/></svg></button><div class="grow stack" style="gap:6px"><div style="display:flex;justify-content:space-between;font-size:13px;font-weight:500;color:#3E5C4C"><span>Repérage</span><span>'+(S.q+1)+' sur '+QUIZ.length+'</span></div><div class="bar"><i style="width:'+pct+'%"></i></div></div></div>';
+  h+='<div class="stack" style="gap:8px;margin-top:6px"><p class="kicker">'+q.k+'</p><h1>'+q.t+'</h1><p class="lead">'+(q.multi?'Coche tout ce que tu vois souvent. Il n\'y a pas de bonne réponse.':'Une seule réponse.')+'</p></div><div class="stack">';
+  q.o.forEach(function(o,i){ var on=has(a,i); h+='<button class="opt'+(on?' on':'')+'" data-a="opt" data-v="'+i+'" aria-pressed="'+on+'">'+(on?IC.check:IC.ring)+'<span>'+o[0]+'</span></button>'; });
+  h+='</div><div class="grow"></div><p class="small">Ce repérage ne pose pas de diagnostic. Il sert à choisir par où commencer.</p><button class="btn" data-a="next"'+(a.length?'':' disabled')+'>'+(S.q<QUIZ.length-1?'Suivant':'Voir mon point de départ')+'</button>'; return h; }
+function vResultat(){ var t=topProg(), p=PROGS[t.key], others=ORDER.filter(function(k){return k!==t.key && t.sc[k]>0;});
+  var h='<p class="kicker">Ton point de départ</p><h1>'+p.name+'</h1>';
+  h+='<p class="lead">'+(t.max>0?'Tu as surtout coché '+p.why:'Tu n\'as presque rien coché, et c\'est une bonne nouvelle. Tu peux quand même essayer le programme du soir : il structure la fin de journée.')+'</p>';
+  if(t.key!=='soir') h+='<div class="card"><p class="small"><b style="color:#09371F">Dans cette démo</b>, seul le programme du soir est construit. On continue avec lui pour te montrer le principe.</p></div>';
+  h+='<div class="tint stack" style="gap:14px"><div class="row">'+IC.clock+'<b style="font-size:15px">7 minutes par soir pendant 21 jours</b></div><div class="row">'+IC.cards+'<b style="font-size:15px">Ton MINI choisit un geste par jour</b></div><div class="row">'+IC.list+'<b style="font-size:15px">Une grille refaite tous les 7 jours</b></div></div>';
+  h+='<div class="card"><p style="font-size:13px;font-weight:600;margin-bottom:6px">Ce n\'est pas un diagnostic</p><p class="small">S\'il ronfle, fait des pauses en respirant, mouille encore son lit ou régresse brutalement : le médecin d\'abord. Ce programme vient en plus, jamais à la place.</p></div>';
+  if(others.length){ h+='<div class="stack" style="gap:8px"><p class="small">Tu as aussi coché des signes ici, pour plus tard :</p><div class="chips">'+others.map(function(k){return '<span class="chip coral">'+PROGS[k].chip+'</span>';}).join('')+'</div></div>'; }
+  h+='<div class="grow"></div><button class="btn" data-a="toGrid">Commencer par la grille du jour 1</button>'; return h; }
+function vGrille(which){ var set={1:S.grid1,7:S.grid7,14:S.grid14,21:S.grid21}[which], a='g'+which;
+  var week='Coche ce que tu vois ce soir sans chercher à te souvenir de la dernière fois. Une semaine reste courte, alors on se contente de noter.';
+  var T={1:'Regarde ton MINI ce soir sans rien changer',7:'On refait la grille après une semaine',14:'On refait la grille après deux semaines',21:'On refait une dernière fois la grille du jour 1'}[which];
+  var L={1:'Coche ce que tu vois. Tu referas exactement la même grille tous les 7 jours.',7:week,14:week,21:'Coche ce que tu vois encore ce soir sans chercher à te souvenir de ce que tu avais coché.'}[which];
+  var B={1:'Enregistrer ma grille',7:'Enregistrer le point de la semaine',14:'Enregistrer le point de la semaine',21:'Comparer avec le jour 1'}[which];
+  var h='<p class="kicker">Grille d\'observation · Jour '+which+'</p><h1>'+T+'</h1><p class="lead">'+L+'</p><div class="stack" style="gap:8px">';
+  GRID.forEach(function(g,i){ var on=has(set,i); h+='<label class="check'+(on?' on':'')+'"><input type="checkbox" data-a="'+a+'" data-v="'+i+'"'+(on?' checked':'')+'><span>'+g+'</span></label>'; });
+  h+='</div><div class="grow"></div><div class="row"><span class="dot" style="width:44px;height:44px;border-radius:22px;background:#FF8370;font-size:18px;font-weight:700;flex-shrink:0">'+set.length+'</span><p class="small">'+(set.length>1?'cases cochées':'case cochée')+' ce soir. C\'est ton point de repère, pas une note.</p></div><button class="btn" data-a="saveG'+which+'">'+B+'</button>'; return h; }
+function vJour(){ var ks=SETS[(S.day-1)%4], already=S.done[S.day];
+  var h='<p class="kicker">Jour '+S.day+' sur 21</p><h1>C\'est ton MINI qui choisit la carte de ce soir</h1><p class="lead">Tends-lui le téléphone pour qu\'il touche le bonhomme qui fait le geste dont il a envie.</p><div class="cards">';
+  ks.forEach(function(k){ var c=CARDS[k], on=S.picked===k; h+='<button class="pick'+(on?' on':'')+'" data-a="pick" data-v="'+k+'" aria-pressed="'+on+'" style="background:'+c.tint+'">'+IC[k]+'<b>'+c.title+'</b></button>'; });
+  h+='</div>';
+  if(S.picked){ var c=CARDS[S.picked]; h+='<div class="card stack" style="gap:12px"><div class="anim" style="background:'+c.tint+'">'+IC[S.picked]+'</div><h2>'+c.title+'</h2><p style="font-size:14px;line-height:1.55">'+c.txt+'</p><div class="chips">'+'<span class="chip" style="background:'+c.tint+'">'+c.need+'</span>'+c.meta.map(function(m){return '<span class="chip">'+m+'</span>';}).join('')+'</div><p class="small"><b style="color:#09371F">Pourquoi.</b> '+c.why+'</p><p class="small"><b style="color:#09371F">Si ça l\'excite.</b> '+c.hot+'</p><p class="small"><b style="color:#09371F">Stop si.</b> '+c.stop+'</p></div>'; }
+  else { h+='<div class="card"><p class="small">'+(already?'La carte du jour est déjà faite. Il peut en choisir une autre s\'il en redemande.':'Aucune carte choisie pour l\'instant. Laisse-le prendre son temps : choisir fait déjà partie du jeu.')+'</p></div>'; }
+  h+='<div class="grow"></div><button class="btn" data-a="done"'+(S.picked?'':' disabled')+'>C\'est fait, il a gagné sa gommette</button>'; return h; }
+function vSuivi(){ var n=Object.keys(S.done).length-(S.pending?1:0), full=n===21;
+  var h='<p class="kicker">Le suivi de ton MINI</p><h1>'+(n===0?'Ton MINI n\'a pas encore retourné de gommette':(n===1?'Ton MINI a retourné sa première gommette':'Ton MINI a déjà retourné '+n+' gommettes'))+'</h1><div class="card" style="padding:12px"><div class="mosaic'+(full?' full':'')+'">';
+  for(var d=1; d<=21; d++){ var col=(d-1)%7, row=Math.floor((d-1)/7);
+    if(S.pending===d) h+='<button class="tile pend" data-a="flip" data-v="'+d+'" aria-label="Retourner la gommette du jour '+d+'">'+IC.star+'</button>';
+    else if(S.done[d]) h+='<div class="tile on'+(S.lastFlip===d?' flip':'')+'" style="background-position:'+(col/6*100)+'% '+(row/2*100)+'%" title="Jour '+d+' : '+CARDS[S.done[d]].title+'"></div>';
+    else h+='<div class="tile'+(d===S.day?' now':'')+'">'+d+'</div>'; }
+  S.lastFlip=null;
+  h+='</div><p class="small" style="margin-top:10px">'+(S.pending?'<b style="color:#09371F">Ton MINI peut retourner la gommette du jour.</b> Elle cache un morceau du tableau.':(full?'Le tableau de ton MINI est complet et il peut le garder.':'Chaque gommette retournée dévoile un morceau du tableau, qui sera complet au jour 21.'))+'</p>'+(full?'<a class="btn ghost" style="margin-top:12px" download="le-tableau-de-mon-mini.svg" href="'+SCENE+'">Garder le tableau de ton MINI</a>':'')+'</div>';
+  h+='<div class="tint stack" style="gap:10px"><p style="font-size:15px;font-weight:700">Ta grille d\'observation</p>'+meterRow('Jour 1',S.grid1,true,1)+meterRow('Jour 7',S.grid7,S.saved7,7)+meterRow('Jour 14',S.grid14,S.saved14,14)+meterRow('Jour 21',S.grid21,!!S.saved21,21)+'<p class="small">Tu refais la même grille tous les 7 jours. Au jour 21, tu la compares avec celle du jour 1 et je te dis vers qui te tourner si rien n\'a bougé.</p></div>';
+  h+='<div class="card row">'+IC.bell+'<p style="font-size:13px;line-height:1.45">Rappel chaque soir à 19 h 15 : « C\'est l\'heure de la carte. »</p></div><div class="grow"></div>';
+  h+='<button class="btn" data-a="nextDay">'+(S.saved21?'Voir le bilan des 21 jours':dueCheck()?'Faire le point de la semaine':(S.day<21?(S.done[S.day]?'Passer au jour '+(S.day+1):'Aller à la carte du jour'):'Refaire la grille du jour 21'))+'</button><button class="link" data-a="jump21">Démo : sauter directement au jour 21</button>'; return h; }
+function vQuestion(){ var h='<p class="kicker">La question de la semaine</p><h1>Sandy répond chaque semaine à la question d\'un parent</h1><p class="lead">Sa réponse s\'écoute ici et en story.</p>';
+  h+='<div class="tint stack" style="background:#FFE6E0;gap:12px"><p class="kicker" style="color:#09371F">Cette semaine</p><p style="font-size:16px;line-height:1.4;font-weight:600">« Pendant le mur, il s\'excite au lieu de se calmer. Je fais quoi ? »</p><div class="card row" style="padding:12px;border:none"><button aria-label="Écouter la réponse de Sandy" data-a="noop" style="width:48px;height:48px;border-radius:24px;border:none;background:#09371F;display:flex;align-items:center;justify-content:center;flex-shrink:0">'+IC.play+'</button><div class="grow stack" style="gap:6px"><b style="font-size:13px">La réponse de Sandy</b><div class="bar" style="height:6px"><i style="width:35%;height:6px"></i></div></div><span class="small">audio</span></div><p style="font-size:13px;line-height:1.5">En deux mots : tu raccourcis, tu ralentis et tu enchaînes avec une pression, sans jamais supprimer la carte.</p></div>';
+  if(S.sent){ h+='<div class="card stack"><h2>Question reçue</h2><p class="small">« '+S.draft.replace(/[<>&]/g,'')+' »</p><p class="small">Sandy en choisit une par semaine. Si c\'est la tienne, tu l\'entendras ici et en story.</p><button class="link" data-a="again">Poser une autre question</button></div>'; }
+  else { h+='<div class="stack" style="gap:8px"><label class="t" for="q">Ta question</label><textarea id="q" rows="4" placeholder="Depuis le jour 5, il refuse le sandwich…"></textarea></div><div class="card" style="padding:12px 14px"><p class="small">Sandy ne répond pas à chacun : elle choisit chaque semaine la question qui servira au plus de parents. Le bilan est là pour la situation précise de ton enfant.</p></div><div class="grow"></div><button class="btn" data-a="send">Envoyer ma question</button>'; }
+  return h; }
+function vBilan(){ var a=S.grid1.length, b=S.grid21.length, diff=a-b;
+  var h='<p class="kicker">Jour 21</p><h1>'+(diff>0?'Il y a du mouvement sur ta grille':'Ta grille n\'a pas bougé')+'</h1>';
+  h+='<div class="tint stack" style="gap:10px">'+meterRow('Jour 1',S.grid1,true,1)+(S.saved7?meterRow('Jour 7',S.grid7,true,7):'')+(S.saved14?meterRow('Jour 14',S.grid14,true,14):'')+meterRow('Jour 21',S.grid21,true,21)+'</div>';
+  if(diff>0){ h+='<p class="lead">'+diff+(diff>1?' signes':' signe')+' en moins par rapport au jour 1. C\'est ton observation plutôt qu\'une preuve, et elle compte. Garde les cartes qu\'il redemande, trois soirs par semaine.</p><div class="card"><p class="small">Si des signes restent et te pèsent, un bilan permet de regarder ce qui maintient l\'alerte allumée. Rien ne presse.</p></div>'; }
+  else { h+='<p class="lead">Ça arrive, et ça ne veut pas dire que tu as mal fait. 21 soirs de cartes, c\'est déjà un vrai cadre. C\'est le moment de regarder plus loin.</p><div class="card stack"><p style="font-size:14px;font-weight:600">Vers qui te tourner</p><p class="small">Ronflements, pauses respiratoires, pipi au lit qui persiste, douleurs : ton médecin d\'abord. Pour la piste corporelle, un bilan de 45 minutes permet de voir quels réflexes restent actifs, en plus des suivis existants.</p></div>'; }
+  h+='<div class="grow"></div><a class="btn" href="https://www.abcdesreflexes.com" target="_blank" rel="noopener">Voir comment se passe un bilan</a><button class="btn ghost" data-a="tab" data-v="suivi">Revoir le tableau de mon MINI</button><button class="link" data-a="reset">Recommencer la démo</button>'; return h; }
+function vGestes(){ return '<p class="kicker">Planche des gestes</p><h1>Les six bonshommes animés du programme du soir</h1><p class="lead">Chaque bonhomme montre à l\'enfant le geste qu\'il va faire.</p><div class="cards" style="grid-template-columns:repeat(2,minmax(0,1fr))">'+Object.keys(CARDS).map(function(k){ return '<div class="pick" style="background:'+CARDS[k].tint+'">'+IC[k]+'<b>'+CARDS[k].title+'</b></div>'; }).join('')+'</div><div class="grow"></div><button class="btn" data-a="reset">Revenir au début de la démo</button>'; }
+function render(){ var v={gestes:vGestes,accueil:vAccueil,quiz:vQuiz,resultat:vResultat,grille:function(){return vGrille(1);},grille7:function(){return vGrille(7);},grille14:function(){return vGrille(14);},grille21:function(){return vGrille(21);},jour:vJour,suivi:vSuivi,question:vQuestion,bilan:vBilan}[S.screen];
+  document.getElementById('app').innerHTML=v();
+  var tabs=document.getElementById('tabs'), show=has(['jour','suivi','question','bilan'],S.screen); tabs.hidden=!show;
+  if(show){ tabs.innerHTML=[['jour','Ce soir',IC.today],['suivi','Suivi',IC.grid],['question','Question',IC.chat]].map(function(t){ return '<button data-a="tab" data-v="'+t[0]+'" class="'+(S.screen===t[0]?'on':'')+'">'+t[2]+'<span>'+t[1]+'</span></button>'; }).join(''); } }
+document.addEventListener('click',function(e){ var el=e.target.closest('[data-a]'); if(!el||el.disabled) return; var a=el.getAttribute('data-a'); if(a==='g1'||a==='g7'||a==='g14'||a==='g21'||a==='noop') return; var v=el.getAttribute('data-v'); act(a, v!==null && /^\d+$/.test(v)?parseInt(v,10):v); });
+document.addEventListener('change',function(e){ var el=e.target; if(el.matches && el.matches('input[data-a]')) act(el.getAttribute('data-a'),parseInt(el.getAttribute('data-v'),10)); });
+function preset(name){ if(name==='tableau'){ preset('bilan'); S.screen='suivi'; return; } if(name==='retourner'){ preset('suivi'); S.done[4]='kangourou'; S.pending=4; return; } reset(); S.answers=[[0,2],[3],[0],[3],[0],[0]]; S.grid1=[0,1,3,5];
+  if(name==='quiz'){ S.q=0; S.answers=[[0,2],[],[],[],[],[]]; }
+  if(name==='jour'||name==='suivi'||name==='question'){ S.day=4; S.done={1:'mur',2:'cocon',3:'bercement'}; if(name==='jour') S.picked='kangourou'; }
+  if(name==='grille21'||name==='bilan'){ for(var d=1; d<=21; d++) S.done[d]=SETS[(d-1)%4][d%3]; S.day=21; S.grid21=[1]; S.saved21=(name==='bilan'); S.saved7=true; S.grid7=[0,1,3]; S.saved14=true; S.grid14=[1,3]; }
+  if(name==='grille7'||name==='grille14'){ var D=name==='grille7'?7:14; for(var e=1; e<=D; e++) S.done[e]=SETS[(e-1)%4][e%3]; S.day=D; if(D===14){ S.saved7=true; S.grid7=[0,1,3]; } }
+  S.screen=name; }
+function selfTest(){ var r=[], ok=function(n,c){ r.push((c?'OK   ':'FAIL ')+n); }, html=function(){ return document.getElementById('app').innerHTML; };
+  reset(); render(); ok('accueil affiché', html().indexOf('Commencer le repérage')>0);
+  act('start'); ok('quiz question 1', S.screen==='quiz' && html().indexOf('1 sur 6')>0);
+  ok('bouton suivant désactivé sans réponse', html().indexOf('data-a="next" disabled')>0);
+  act('opt',0); act('opt',2); ok('multi-sélection', S.answers[0].length===2);
+  act('opt',3); ok('« rien » efface les autres', S.answers[0].length===1 && S.answers[0][0]===3);
+  act('opt',0); ok('une réponse efface « rien »', S.answers[0].length===1 && S.answers[0][0]===0);
+  act('next'); act('opt',3); act('next'); act('opt',0); act('next'); act('opt',3); act('next'); act('opt',0); act('next');
+  ok('question 6 à choix unique', S.q===5); act('opt',1); act('opt',0); ok('choix unique remplace', S.answers[5].length===1 && S.answers[5][0]===0);
+  act('next'); ok('résultat = programme du soir', S.screen==='resultat' && topProg().key==='soir' && html().indexOf('Le programme du soir')>0);
+  ok('signes secondaires affichés', html().indexOf('La bouche')>0);
+  act('toGrid'); act('g1',0); act('g1',1); act('g1',3); act('g1',1); ok('grille jour 1 : 2 cases', S.grid1.length===2 && html().indexOf('>2</span>')>0);
+  act('saveG1'); ok('jour 1 affiché', S.screen==='jour' && html().indexOf('Jour 1 sur 21')>0 && html().indexOf('data-a="done" disabled')>0);
+  act('pick','sandwich'); ok('bonhomme animé dans la carte choisie', html().indexOf('class="anim"')>0 && html().indexOf('class="fb"')>0);
+  ok('carte choisie, consigne visible', html().indexOf('Jamais sur la tête ni la nuque')>0 && html().indexOf('data-a="done" disabled')<0);
+  act('done'); ok('gommette à retourner proposée', S.pending===1 && html().indexOf('data-a="flip"')>0 && html().indexOf('tile on')<0);
+  act('flip',1);   ok('la gommette dévoile un morceau du tableau', html().indexOf('tile on')>0 && html().split('tile on').length===2);
+  ok('gommette collée', S.done[1]==='sandwich' && S.screen==='suivi' && html().indexOf('première gommette')>0);
+  act('nextDay'); ok('jour 2 propose un autre jeu de cartes', S.day===2 && html().indexOf('Le kangourou')>0);
+  act('tab','question'); ok('écran question', html().indexOf('Ta question')>0);
+  document.getElementById('q').value='Il refuse le sandwich'; act('send'); ok('question envoyée', S.sent && html().indexOf('Question reçue')>0);
+  act('tab','suivi'); act('jump21'); ok('saut au jour 21', S.screen==='grille21' && S.day===21 && Object.keys(S.done).length===20);
+  act('g21',0); act('saveG21'); ok('bilan : 1 signe en moins', S.screen==='bilan' && html().indexOf('1 signe en moins')>0);
+  S.grid21=[0,1,2]; render(); ok('bilan : rien n\'a bougé', html().indexOf('n\'a pas bougé')>0 && html().indexOf('Vers qui te tourner')>0);
+  preset('suivi'); S.day=7; for(var d7=4; d7<=7; d7++) S.done[d7]='mur'; render(); ok('jour 7 : point de la semaine proposé', html().indexOf('Faire le point de la semaine')>0);
+  act('nextDay'); ok('grille du jour 7 ouverte', S.screen==='grille7' && html().indexOf('Jour 7')>0);
+  act('g7',0); act('saveG7'); ok('point du jour 7 enregistré', S.saved7 && S.screen==='suivi' && html().indexOf('1 sur 7')>0);
+  act('nextDay'); ok('jour 8 après le point', S.day===8 && S.screen==='jour');
+  preset('suivi'); act('nextDay'); ok('carte du jour sans sauter de jour', S.day===4 && S.screen==='jour');
+  preset('bilan'); render(); act('tab','suivi'); ok('tableau complet à garder au jour 21', html().indexOf('est complet')>0 && html().indexOf('download=')>0 && html().split('tile on').length===22);
+  preset('bilan'); render(); ok('bilan : quatre grilles', html().indexOf('Jour 7')>0 && html().indexOf('Jour 14')>0);
+  ['accueil','quiz','resultat','grille','jour','suivi','question','grille7','grille14','grille21','bilan','gestes','tableau'].forEach(function(n){ preset(n); try{ render(); ok('rendu '+n, html().length>200 && html().indexOf('undefined')<0 && html().indexOf('NaN')<0); }catch(err){ ok('rendu '+n+' : '+err.message,false); } });
+  var fails=r.filter(function(x){return x.indexOf('FAIL')===0;}).length; document.title='SELFTEST '+(fails?'FAIL '+fails:'OK '+r.length); var pre=document.getElementById('selftest'); pre.hidden=false; pre.textContent=r.join('\n'); }
+(function(){ if(/[?&]f=b/.test(location.search)) document.documentElement.classList.add('fb-only'); var h=(location.hash||'').replace('#',''); if(h==='selftest'){ reset(); selfTest(); return; } if(h && h!=='accueil'){ preset(h); render(); } else { reset(); render(); } })();
+</script>
+</body>
+</html>
