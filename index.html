@@ -224,18 +224,20 @@ function vResultat(){ var t=topProg(), p=PROGS[t.key], others=ORDER.filter(funct
   var h='<p class="kicker">Ton point de départ</p><h1>'+p.name+'</h1>';
   h+='<p class="lead">'+(t.max>0?'Tu as surtout coché '+p.why:'Tu n\'as presque rien coché, et c\'est une bonne nouvelle. Tu peux quand même essayer le programme du soir : il structure la fin de journée.')+'</p>';
   if(t.key!=='soir') h+='<div class="card"><p class="small"><b style="color:#09371F">Dans cette démo</b>, seul le programme du soir est construit. On continue avec lui pour te montrer le principe.</p></div>';
-  h+='<div class="tint stack" style="gap:14px"><div class="row">'+IC.clock+'<b style="font-size:15px">7 minutes par soir pendant 21 jours</b></div><div class="row">'+IC.cards+'<b style="font-size:15px">Ton MINI choisit un geste par jour</b></div><div class="row">'+IC.list+'<b style="font-size:15px">Une grille refaite tous les 7 jours</b></div></div>';
+  h+='<div class="tint stack" style="gap:14px"><div class="row">'+IC.clock+'<b style="font-size:15px">21 jours d\'activité de 7 minutes, à ton rythme</b></div><div class="row">'+IC.cards+'<b style="font-size:15px">Ton MINI choisit un geste par jour</b></div><div class="row">'+IC.list+'<b style="font-size:15px">Une grille refaite tous les 7 jours d\'activité</b></div></div>';
   h+='<div class="card"><p style="font-size:13px;font-weight:600;margin-bottom:6px">Ce n\'est pas un diagnostic</p><p class="small">S\'il ronfle, fait des pauses en respirant, mouille encore son lit ou régresse brutalement : le médecin d\'abord. Ce programme vient en plus, jamais à la place.</p></div>';
   if(others.length){ h+='<div class="stack" style="gap:8px"><p class="small">Tu as aussi coché des signes ici, pour plus tard :</p><div class="chips">'+others.map(function(k){return '<span class="chip coral">'+PROGS[k].chip+'</span>';}).join('')+'</div></div>'; }
   h+='<div class="grow"></div><button class="btn" data-a="toCommit">Choisir mes soirs</button>'; return h; }
+function semaines(j,f){ var w=Math.ceil(j/f); return w+' semaine'+(w>1?'s':''); }
 function joursTxt(){ return S.days.map(function(d){return JOURS[d];}).join(', '); }
 function agenda(){ var d=new Date(), pad=function(x){return (x<10?'0':'')+x;}, hm=S.hour.replace(' h ',':').replace(' h',':00').split(':');
   var ics=['BEGIN:VCALENDAR','VERSION:2.0','PRODID:-//ABC des reflexes//Programme du soir//FR','BEGIN:VEVENT','UID:programme-soir-'+d.getTime()+'@abcdesreflexes.com','DTSTAMP:'+d.getUTCFullYear()+pad(d.getUTCMonth()+1)+pad(d.getUTCDate())+'T000000Z','DTSTART:'+d.getFullYear()+pad(d.getMonth()+1)+pad(d.getDate())+'T'+pad(parseInt(hm[0],10))+pad(parseInt(hm[1],10))+'00','DURATION:PT10M','RRULE:FREQ=WEEKLY;BYDAY='+S.days.map(function(x){return JOURS_ICS[x];}).join(',')+';COUNT=21','SUMMARY:Le programme du soir avec mon MINI (7 minutes)','BEGIN:VALARM','ACTION:DISPLAY','DESCRIPTION:C\'est l\'heure de la carte','TRIGGER:-PT10M','END:VALARM','END:VEVENT','END:VCALENDAR'].join('\r\n');
   return 'data:text/calendar;charset=utf-8,'+encodeURIComponent(ics); }
 function vEngagement(){ var f=S.freq;
-  var h='<p class="kicker">Ton engagement</p><h1>Combien de soirs par semaine veux-tu faire le programme avec ton MINI ?</h1><p class="lead">Choisis un rythme que tu peux vraiment tenir, tu pourras le changer à tout moment.</p>';
+  var h='<p class="kicker">Ton engagement</p><h1>Combien de soirs par semaine veux-tu faire le programme avec ton MINI ?</h1><p class="lead">Le programme compte 21 jours d\'activité, que tu répartis sur autant de semaines qu\'il te faut. Choisis un rythme que tu peux vraiment tenir, tu pourras le changer à tout moment.</p>';
   h+='<div class="pills">'+[0,1,2,3,4,5,6,7].map(function(i){ return '<button class="pill'+(f===i?' on':'')+'" data-a="freq" data-v="'+i+'" aria-pressed="'+(f===i)+'">'+i+'</button>'; }).join('')+'</div>';
   if(f>0){
+    h+='<p class="small"><b style="color:#09371F">À ce rythme, tes 21 jours d\'activité te prendront '+semaines(21,f)+'.</b></p>';
     h+='<p class="lbl">Quels soirs ?</p><div class="pills">'+JOURS.map(function(j,i){ var on=has(S.days,i); return '<button class="pill'+(on?' on':'')+'" data-a="day" data-v="'+i+'" aria-pressed="'+on+'">'+j+'</button>'; }).join('')+'</div>';
     h+='<p class="lbl">Vers quelle heure ?</p><div class="pills">'+HEURES.map(function(x,i){ return '<button class="pill'+(S.hour===x?' on':'')+'" data-a="hour" data-v="'+i+'">'+x+'</button>'; }).join('')+'</div>';
     h+='<p class="lbl">Comment veux-tu que je te le rappelle ?</p><div class="pills">'+Object.keys(CANAUX).map(function(k){ return '<button class="pill'+(S.channel===k?' on':'')+'" data-a="channel" data-v="'+k+'">'+CANAUX[k]+'</button>'; }).join('')+'</div>';
@@ -250,7 +252,7 @@ function vParcours(){ var sc=scores();
 function vGrille(which){ var set={1:S.grid1,7:S.grid7,14:S.grid14,21:S.grid21}[which], a='g'+which;
   var week='Coche ce que tu vois ce soir sans chercher à te souvenir de la dernière fois. Une semaine reste courte, alors on se contente de noter.';
   var T={1:'Regarde ton MINI ce soir sans rien changer',7:'On refait la grille après une semaine',14:'On refait la grille après deux semaines',21:'On refait une dernière fois la grille du jour 1'}[which];
-  var L={1:'Coche ce que tu vois. Tu referas exactement la même grille tous les 7 jours.',7:week,14:week,21:'Coche ce que tu vois encore ce soir sans chercher à te souvenir de ce que tu avais coché.'}[which];
+  var L={1:'Coche ce que tu vois. Tu referas exactement la même grille tous les 7 jours d\'activité.',7:week,14:week,21:'Coche ce que tu vois encore ce soir sans chercher à te souvenir de ce que tu avais coché.'}[which];
   var B={1:'Enregistrer ma grille',7:'Enregistrer le point de la semaine',14:'Enregistrer le point de la semaine',21:'Comparer avec le jour 1'}[which];
   var h='<p class="kicker">Grille d\'observation · Jour '+which+'</p><h1>'+T+'</h1><p class="lead">'+L+'</p><div class="stack" style="gap:8px">';
   GRID.forEach(function(g,i){ var on=has(set,i); h+='<label class="check'+(on?' on':'')+'"><input type="checkbox" data-a="'+a+'" data-v="'+i+'"'+(on?' checked':'')+'><span>'+g+'</span></label>'; });
@@ -270,10 +272,10 @@ function vSuivi(){ var n=Object.keys(S.done).length-(S.pending?1:0), full=n===21
     else h+='<div class="tile'+(d===S.day?' now':'')+'">'+d+'</div>'; }
   S.lastFlip=null;
   h+='</div><p class="small" style="margin-top:10px">'+(S.pending?'<b style="color:#09371F">Ton MINI peut retourner la gommette du jour.</b> Elle cache un morceau du tableau.':(full?'Le tableau de ton MINI est complet et il peut le garder.':'Chaque gommette retournée dévoile un morceau du tableau, qui sera complet au jour 21.'))+'</p>'+(full?'<a class="btn ghost" style="margin-top:12px" download="le-tableau-de-mon-mini.svg" href="'+SCENE+'">Garder le tableau de ton MINI</a>':'')+'</div>';
-  h+='<div class="tint stack" style="gap:10px"><p style="font-size:15px;font-weight:700">Ta grille d\'observation</p>'+meterRow('Jour 1',S.grid1,true,1)+meterRow('Jour 7',S.grid7,S.saved7,7)+meterRow('Jour 14',S.grid14,S.saved14,14)+meterRow('Jour 21',S.grid21,!!S.saved21,21)+'<p class="small">Tu refais la même grille tous les 7 jours. Au jour 21, tu la compares avec celle du jour 1 et je te dis vers qui te tourner si rien n\'a bougé.</p></div>';
+  h+='<div class="tint stack" style="gap:10px"><p style="font-size:15px;font-weight:700">Ta grille d\'observation</p>'+meterRow('Jour 1',S.grid1,true,1)+meterRow('Jour 7',S.grid7,S.saved7,7)+meterRow('Jour 14',S.grid14,S.saved14,14)+meterRow('Jour 21',S.grid21,!!S.saved21,21)+'<p class="small">Tu refais la même grille tous les 7 jours d\'activité. Au jour 21, tu la compares avec celle du jour 1 et je te dis vers qui te tourner si rien n\'a bougé.</p></div>';
   var rk=S.saved14?14:(S.saved7?7:0); if(rk){ var r=REPERES[rk]; h+='<div class="card stack" style="gap:8px"><p class="kicker">Repère après '+rk+' gommettes</p><h2>'+r.t+'</h2><p class="quote">« '+r.q+' »</p><p class="small">Extrait de '+r.src+'.</p></div>'; }
   if(S.freq>0){ var wk=n%S.freq, full2=(n>0&&wk===0); var faits=full2?S.freq:wk;
-    h+='<div class="card stack" style="gap:10px"><div class="row">'+IC.bell+'<p style="font-size:13px;line-height:1.45"><b>Tes soirs : '+joursTxt()+' à '+S.hour+'.</b> Rappel par '+CANAUX[S.channel].toLowerCase().replace('mon agenda','ton agenda')+'.</p></div><div class="meter"><b>Semaine</b><div class="track"><i style="width:'+Math.round(faits/S.freq*100)+'%"></i></div><span>'+faits+' sur '+S.freq+'</span></div><div class="row" style="gap:16px"><button class="link" style="padding:0;min-height:32px" data-a="toCommit">Changer mes soirs</button>'+(S.channel==='agenda'?'<a class="link" style="padding:0;min-height:32px;display:inline-flex;align-items:center" download="programme-du-soir.ics" href="'+agenda()+'">Ajouter à mon agenda</a>':'')+'</div></div>';
+    h+='<div class="card stack" style="gap:10px"><div class="row">'+IC.bell+'<p style="font-size:13px;line-height:1.45"><b>Tes soirs : '+joursTxt()+' à '+S.hour+'.</b> Rappel par '+CANAUX[S.channel].toLowerCase().replace('mon agenda','ton agenda')+'.</p></div><div class="meter"><b>Semaine</b><div class="track"><i style="width:'+Math.round(faits/S.freq*100)+'%"></i></div><span>'+faits+' sur '+S.freq+'</span></div>'+(n<21?'<p class="small">Il te reste '+(21-n)+' jour'+(21-n>1?'s':'')+' d\'activité, soit '+semaines(21-n,S.freq)+' à ce rythme.</p>':'')+'<div class="row" style="gap:16px"><button class="link" style="padding:0;min-height:32px" data-a="toCommit">Changer mes soirs</button>'+(S.channel==='agenda'?'<a class="link" style="padding:0;min-height:32px;display:inline-flex;align-items:center" download="programme-du-soir.ics" href="'+agenda()+'">Ajouter à mon agenda</a>':'')+'</div></div>';
   } else { h+='<div class="card row">'+IC.bell+'<p style="font-size:13px;line-height:1.45">Tu n\'as pas choisi de soirs, donc pas de rappel. <button class="link" style="padding:0;min-height:0" data-a="toCommit">Choisir mes soirs</button></p></div>'; }
   h+='<div class="grow"></div>';
   h+='<button class="btn" data-a="nextDay">'+(S.saved21?'Voir le bilan des 21 jours':dueCheck()?'Faire le point de la semaine':(S.day<21?(S.done[S.day]?'Passer au jour '+(S.day+1):'Aller à la carte du jour'):'Refaire la grille du jour 21'))+'</button><button class="link" data-a="jump21">Démo : sauter directement au jour 21</button>'; return h; }
@@ -312,11 +314,12 @@ function selfTest(){ var r=[], ok=function(n,c){ r.push((c?'OK   ':'FAIL ')+n); 
   ok('question 6 à choix unique', S.q===5); act('opt',1); act('opt',0); ok('choix unique remplace', S.answers[5].length===1 && S.answers[5][0]===0);
   act('next'); ok('résultat = programme du soir', S.screen==='resultat' && topProg().key==='soir' && html().indexOf('Le programme du soir')>0);
   ok('signes secondaires affichés', html().indexOf('La bouche')>0);
-  act('toCommit'); ok('engagement : 4 soirs proposés', S.screen==='engagement' && S.freq===4 && html().indexOf('Je m\'engage pour 4 soirs par semaine')>0);
+  act('toCommit'); ok('engagement : 4 soirs proposés', S.screen==='engagement' && S.freq===4 && html().indexOf('Je m\'engage pour 4 soirs par semaine')>0 && html().indexOf('te prendront 6 semaines')>0);
   act('freq',2); ok('2 soirs : deux jours cochés', S.days.length===2 && html().indexOf('pour 2 soirs')>0);
   act('day',5); ok('ajouter un jour change le rythme', S.freq===3 && has(S.days,5));
   act('freq',0); ok('zéro soir : sans engagement ni rappel', html().indexOf('Continuer sans engagement')>0 && html().indexOf('pas de rappel')>0);
-  act('freq',1); ok('un seul soir au singulier', html().indexOf('pour 1 soir par semaine')>0);
+  act('freq',1); ok('un seul soir au singulier', html().indexOf('pour 1 soir par semaine')>0 && html().indexOf('21 semaines')>0);
+  act('freq',7); ok('tous les soirs : 3 semaines', html().indexOf('te prendront 3 semaines')>0);
   act('freq',4); act('channel','whatsapp'); act('hour',2); ok('canal et heure choisis', S.channel==='whatsapp' && S.hour==='20 h' && html().indexOf('message WhatsApp à 20 h')>0);
   act('commit'); ok('engagement pris, on passe à la grille', S.committed && S.screen==='grille');
   act('toGrid'); act('g1',0); act('g1',1); act('g1',3); act('g1',1); ok('grille jour 1 : 2 cases', S.grid1.length===2 && html().indexOf('>2</span>')>0);
@@ -338,7 +341,7 @@ function selfTest(){ var r=[], ok=function(n,c){ r.push((c?'OK   ':'FAIL ')+n); 
   act('nextDay'); ok('jour 8 après le point', S.day===8 && S.screen==='jour');
   preset('suivi'); act('nextDay'); ok('carte du jour sans sauter de jour', S.day===4 && S.screen==='jour');
   preset('bilan'); render(); act('tab','suivi'); ok('tableau complet à garder au jour 21', html().indexOf('est complet')>0 && html().indexOf('download=')>0 && html().split('tile on').length===22);
-  preset('suivi'); render(); ok('suivi : soirs et semaine affichés', html().indexOf('Tes soirs : lun, mar, jeu, dim à 19 h 15')>0 && html().indexOf('3 sur 4')>0 && html().indexOf('BEGIN%3AVCALENDAR')>0);
+  preset('suivi'); render(); ok('suivi : soirs et semaine affichés', html().indexOf('Tes soirs : lun, mar, jeu, dim à 19 h 15')>0 && html().indexOf('3 sur 4')>0 && html().indexOf('BEGIN%3AVCALENDAR')>0 && html().indexOf('Il te reste 18 jours d\'activité, soit 5 semaines')>0);
   act('toCommit'); act('freq',5); act('commit'); ok('changer ses soirs revient au suivi', S.screen==='suivi' && S.freq===5);
   act('tab','parcours'); ok('onglet parcours', html().indexOf('Tout à la bouche')>0 && html().indexOf('Repéré dans tes réponses')>0);
   act('wait','bouche'); ok('liste d\'attente notée', S.wait.bouche && html().indexOf('C\'est noté')>0);
