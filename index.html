@@ -219,8 +219,8 @@ function act(name,arg){
   else if(name==='nextDay'){ S.pending=null; var due=dueCheck(); if(S.saved21){ go('bilan'); } else if(due){ go('grille'+due); } else if(!S.done[S.day] && S.day<21){ S.picked=null; go('jour'); } else if(S.day<21){ S.day++; S.picked=null; go('jour'); } else go('grille21'); }
   else if(name==='g7'){ toggle(S.grid7,arg); render(); }
   else if(name==='g14'){ toggle(S.grid14,arg); render(); }
-  else if(name==='saveG7'){ S.saved7=true; go('suivi'); toast('Point de la semaine enregistré'); }
-  else if(name==='saveG14'){ S.saved14=true; go('suivi'); toast('Point de la semaine enregistré'); }
+  else if(name==='saveG7'){ S.saved7=true; go('suivi'); toast('Point d\'étape enregistré'); }
+  else if(name==='saveG14'){ S.saved14=true; go('suivi'); toast('Point d\'étape enregistré'); }
   else if(name==='jump21'){ S.pending=null; for(var d=1; d<=20; d++){ if(!S.done[d]) S.done[d]=SETS[(d-1)%4][d%3]; } if(!S.saved7){ S.grid7=S.grid1.slice(); S.saved7=true; } if(!S.saved14){ S.grid14=S.grid1.slice(0,Math.max(S.grid1.length-1,0)); S.saved14=true; } S.day=21; S.picked=null; go('grille21'); }
   else if(name==='g21'){ toggle(S.grid21,arg); render(); }
   else if(name==='saveG21'){ S.done[21]=S.done[21]||'bougie'; S.saved21=true; go('bilan'); }
@@ -269,10 +269,10 @@ function vParcours(){ var sc=scores();
     h+= cur ? pCard(x,{on:true,chip:'En cours'}) : pCard(x,{a:'wait',on:on,note:on?'Tu seras prévenue quand il sortira.':'',chip:(!on&&sc[x.k]>0)?'Repéré dans tes réponses':''}); });
   h+='</div><p class="small">Dans la vraie version, toucher un parcours sert à savoir lequel construire en premier.</p>'; return h; }
 function vGrille(which){ var set={1:S.grid1,7:S.grid7,14:S.grid14,21:S.grid21}[which], a='g'+which;
-  var week='Coche ce que tu vois ce soir sans chercher à te souvenir de la dernière fois. Une semaine reste courte, alors on se contente de noter.';
-  var T={1:'Regarde ton MINI ce soir sans rien changer',7:'On refait la grille après une semaine',14:'On refait la grille après deux semaines',21:'On refait une dernière fois la grille du jour 1'}[which];
+  var week='Coche ce que tu vois ce soir sans chercher à te souvenir de la dernière fois. Sept jours d\'activité, c\'est encore court, alors on se contente de noter.';
+  var T={1:'Regarde ton MINI ce soir sans rien changer',7:'On refait la grille après 7 jours d\'activité',14:'On refait la grille après 14 jours d\'activité',21:'On refait une dernière fois la grille du jour 1'}[which];
   var L={1:'Coche ce que tu vois. Tu referas exactement la même grille tous les 7 jours d\'activité.',7:week,14:week,21:'Coche ce que tu vois encore ce soir sans chercher à te souvenir de ce que tu avais coché.'}[which];
-  var B={1:'Enregistrer ma grille',7:'Enregistrer le point de la semaine',14:'Enregistrer le point de la semaine',21:'Comparer avec le jour 1'}[which];
+  var B={1:'Enregistrer ma grille',7:'Enregistrer mon point d\'étape',14:'Enregistrer mon point d\'étape',21:'Comparer avec le jour 1'}[which];
   var h='<p class="kicker">Grille d\'observation · Jour '+which+'</p><h1>'+T+'</h1><p class="lead">'+L+'</p><div class="stack" style="gap:8px">';
   GRID.forEach(function(g,i){ var on=has(set,i); h+='<label class="check'+(on?' on':'')+'"><input type="checkbox" data-a="'+a+'" data-v="'+i+'"'+(on?' checked':'')+'><span>'+g+'</span></label>'; });
   h+='</div><div class="grow"></div><div class="row"><span class="dot" style="width:44px;height:44px;border-radius:22px;background:#FF8370;font-size:18px;font-weight:700;flex-shrink:0">'+set.length+'</span><p class="small">'+(set.length>1?'cases cochées':'case cochée')+' ce soir. C\'est ton point de repère, pas une note.</p></div><button class="btn" data-a="saveG'+which+'">'+B+'</button>'; return h; }
@@ -297,7 +297,7 @@ function vSuivi(){ var n=Object.keys(S.done).length-(S.pending?1:0), full=n===21
     h+='<div class="card stack" style="gap:10px"><div class="row">'+IC.bell+'<p style="font-size:13px;line-height:1.45"><b>Tes soirs : '+joursTxt()+' à '+S.hour+'.</b> Rappel par '+CANAUX[S.channel].toLowerCase().replace('mon agenda','ton agenda')+'.</p></div><div class="meter"><b>Semaine</b><div class="track"><i style="width:'+Math.round(faits/S.freq*100)+'%"></i></div><span>'+faits+' sur '+S.freq+'</span></div>'+(n<21?'<p class="small">Il te reste '+(21-n)+' jour'+(21-n>1?'s':'')+' d\'activité, soit '+semaines(21-n,S.freq)+' à ce rythme.</p>':'')+'<div class="row" style="gap:16px"><button class="link" style="padding:0;min-height:32px" data-a="toCommit">Changer mes soirs</button>'+(S.channel==='agenda'?'<a class="link" style="padding:0;min-height:32px;display:inline-flex;align-items:center" download="programme-du-soir.ics" href="'+agenda()+'">Ajouter à mon agenda</a>':'')+'</div></div>';
   } else { h+='<div class="card row">'+IC.bell+'<p style="font-size:13px;line-height:1.45">Tu n\'as pas choisi de soirs, donc pas de rappel. <button class="link" style="padding:0;min-height:0" data-a="toCommit">Choisir mes soirs</button></p></div>'; }
   h+='<div class="grow"></div>';
-  h+='<button class="btn" data-a="nextDay">'+(S.saved21?'Voir le bilan des 21 jours':dueCheck()?'Faire le point de la semaine':(S.day<21?(S.done[S.day]?'Passer au jour '+(S.day+1):'Aller à la carte du jour'):'Refaire la grille du jour 21'))+'</button><button class="link" data-a="jump21">Démo : sauter directement au jour 21</button>'; return h; }
+  h+='<button class="btn" data-a="nextDay">'+(S.saved21?'Voir le bilan des 21 jours':dueCheck()?'Faire le point après '+dueCheck()+' jours d\'activité':(S.day<21?(S.done[S.day]?'Passer au jour '+(S.day+1):'Aller à la carte du jour'):'Refaire la grille du jour 21'))+'</button><button class="link" data-a="jump21">Démo : sauter directement au jour 21</button>'; return h; }
 function vQuestion(){ var h='<p class="kicker">La question de la semaine</p><h1>Sandy répond chaque semaine à la question d\'un parent</h1><p class="lead">Sa réponse s\'écoute ici et en story.</p>';
   h+='<div class="tint stack" style="background:#FFE6E0;gap:12px"><p class="kicker" style="color:#09371F">Cette semaine</p><p style="font-size:16px;line-height:1.4;font-weight:600">« Tu proposes quoi à la place quand ça bouge dans tous les sens ? »</p><div class="card row" style="padding:12px;border:none"><button aria-label="Écouter la réponse de Sandy" data-a="noop" style="width:48px;height:48px;border-radius:24px;border:none;background:#09371F;display:flex;align-items:center;justify-content:center;flex-shrink:0">'+IC.play+'</button><div class="grow stack" style="gap:6px"><b style="font-size:13px">La réponse de Sandy</b><div class="bar" style="height:6px"><i style="width:35%;height:6px"></i></div></div><span class="small">audio</span></div><p style="font-size:13px;line-height:1.5">Question posée par une maman en commentaire d\'un post de Sandy.</p></div>';
   h+='<p class="lbl">Les réponses des semaines précédentes</p><div class="stack">'+['Semaine 2','Semaine 1'].map(function(w){ return '<button class="opt" data-a="noop" style="min-height:52px">'+IC.play.replace('#FFFFFF','#09371F')+'<span><b>'+w+'</b><br><span class="small">La question retenue et la réponse de Sandy</span></span></button>'; }).join('')+'</div>';
@@ -356,7 +356,7 @@ function selfTest(){ var r=[], ok=function(n,c){ r.push((c?'OK   ':'FAIL ')+n); 
   act('tab','suivi'); act('jump21'); ok('saut au jour 21', S.screen==='grille21' && S.day===21 && Object.keys(S.done).length===20);
   act('g21',0); act('saveG21'); ok('bilan : 1 signe en moins', S.screen==='bilan' && html().indexOf('1 signe en moins')>0);
   S.grid21=[0,1,2]; render(); ok('bilan : rien n\'a bougé', html().indexOf('n\'a pas bougé')>0 && html().indexOf('Vers qui te tourner')>0);
-  preset('suivi'); S.day=7; for(var d7=4; d7<=7; d7++) S.done[d7]='mur'; render(); ok('jour 7 : point de la semaine proposé', html().indexOf('Faire le point de la semaine')>0);
+  preset('suivi'); S.day=7; for(var d7=4; d7<=7; d7++) S.done[d7]='mur'; render(); ok('jour 7 : point d\'étape proposé', html().indexOf('Faire le point après 7 jours d\'activité')>0);
   act('nextDay'); ok('grille du jour 7 ouverte', S.screen==='grille7' && html().indexOf('Jour 7')>0);
   act('g7',0); act('saveG7'); ok('point du jour 7 enregistré', S.saved7 && S.screen==='suivi' && html().indexOf('1 sur 7')>0);
   act('nextDay'); ok('jour 8 après le point', S.day===8 && S.screen==='jour');
